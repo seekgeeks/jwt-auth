@@ -5,14 +5,18 @@
  * @create date 2019-01-11 00:22:22
  * @modify date 2019-01-11 00:22:22
  * @desc [description]
+ * 
+ * GITHUB   :   https://github.com/thedijje
+ * Project  :   JWT-Auth
+ * URL      :   https://github.com/seekgeeks/jwt-auth
  */
 
 
 function jwt_config(){
     $param  =   array(
         'key'   =>  array(
-            'jwt_secrate_pre'   =>  PRE_SECRATE_KEY,
-            'jwt_secrate_post'  =>  POST_SECRATE_KEY
+            'jwt_secrate_pre'   =>  YOUR_PRE_KEY,
+            'jwt_secrate_post'  =>  YOUR_POST_KEY
         ),
         'version' =>  1.0       
     );
@@ -32,8 +36,8 @@ function create_jwt($param  =   array() ){
     */
     $token_key  =   jwt_config();
 
-    $pre_key    =   $token_key['key']['jwt_secrate_pre'];
-    $post_key   =   $token_key['key']['jwt_secrate_post'];
+    $pre_key    =   base64_encode($token_key['key']['jwt_secrate_pre']);
+    $post_key   =   base64_encode($token_key['key']['jwt_secrate_post']);
     $key_version=   $token_key['version'];
 
     /*
@@ -55,24 +59,43 @@ function create_jwt($param  =   array() ){
 
 
 function verify_jwt($token  =   ''){
-    if($token   =   ''){
+    if($token   ==   ''){
         return false;
     }
     $token_key  =   jwt_config();
-
-    $pre_key    =   $token_key['key']['jwt_secrate_pre'];
-    $post_key   =   $token_key['key']['jwt_secrate_post'];
+    /*
+    *   Fetch all secrates fron config
+    *   Fetch version from config
+    *
+    */
+    $pre_key    =   base64_encode($token_key['key']['jwt_secrate_pre']);
+    $post_key   =   base64_encode($token_key['key']['jwt_secrate_post']);
     $key_version=   $token_key['version'];
 
+    /*
+    *   Decode token from base64 encoding format 
+    */
+    $decoded_token  =   base64_decode($token);
 
-    $decoded_token  =   base64_decode($decode);
-
+    /*
+    *   Decode from json format to PHP array
+    */
     $token_array    =   json_decode($decoded_token);
 
+    /*
+    *   Validate pre key
+    *   Validate post key
+    *   Validate version
+    *
+    */
     if($token_array[0]!=$pre_key OR $token_array[3]!=$post_key OR $token_array[2]!=$key_version){
-        return false;
-    }
 
+        return false;
+    
+    }
+    /*
+    *   Return array of payload
+    */
     return $token_array[1];
 
 
